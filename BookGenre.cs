@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-    public enum Genre
+    public enum BookGenre
     {
         Detective,
         Fantasy,

@@ -66,13 +66,13 @@ while (true)
             if (choiceSearch == "1")
             {
                 foundBooks = books
-                    .Where(b => b.title.Equals(searchValue, StringComparison.OrdinalIgnoreCase))
+                    .Where(b => b.Title.Equals(searchValue, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
             else if (choiceSearch == "2")
             {
                 foundBooks = books
-                    .Where(b => b.author.Equals(searchValue, StringComparison.OrdinalIgnoreCase))
+                    .Where(b => b.Author.Equals(searchValue, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
@@ -96,6 +96,7 @@ while (true)
             Console.WriteLine("2 - Збільшити кількість");
             Console.WriteLine("3 - Зменшити кількість");
             Console.WriteLine("4 - Порівняти з іншою книгою");
+            Console.WriteLine("5 - Змінити кількість сторінок");
             Console.Write("Виберіть опцію: ");
             string action = Console.ReadLine();
 
@@ -124,12 +125,19 @@ while (true)
                     var bookToCompare = books[indexBook3 - 1];
                     int result = bookToModify.CompareTo(bookToCompare);
                     if (result < 0)
-                        Console.WriteLine($"{bookToModify.title} вийшла раніше за {bookToCompare.title}");
+                        Console.WriteLine($"{bookToModify.Title} вийшла раніше за {bookToCompare.Title}");
                     else if (result > 0)
-                        Console.WriteLine($"{bookToModify.title} вийшла пізніше за {bookToCompare.title}");
+                        Console.WriteLine($"{bookToModify.Title} вийшла пізніше за {bookToCompare.Title}");
                     else
-                        Console.WriteLine($"{bookToModify.title} та {bookToCompare.title} вийшли в один день");
+                        Console.WriteLine($"{bookToModify.Title} та {bookToCompare.Title} вийшли в один день");
 
+                    break;
+                case "5":
+                    Console.Write("Введіть нову кількість сторінок: ");
+                    if (int.TryParse(Console.ReadLine(), out int newCountOfPages))
+                        bookToModify.SetCountOfPages(newCountOfPages);
+                    else
+                        Console.WriteLine("Неправильна кількість сторінок.");
                     break;
                 default:
                     Console.WriteLine("Неправильна опція.");
@@ -168,7 +176,7 @@ while (true)
             {
                 Console.Write("Введіть значення для видалення: ");
                 string deleteValue = Console.ReadLine();
-                int removed = books.RemoveAll(b => b.title.Equals(deleteValue, StringComparison.OrdinalIgnoreCase));
+                int removed = books.RemoveAll(b => b.Title.Equals(deleteValue, StringComparison.OrdinalIgnoreCase));
                 Console.WriteLine(removed > 0 ? $"Видалено {removed} книг(и)." : "Книг не знайдено.");
             }
             break;
@@ -229,16 +237,16 @@ Book CreateBookFromConsole()
     }
 
     Console.WriteLine("Оберіть жанр:");
-    foreach (var g in Enum.GetValues(typeof(Genre)))
+    foreach (var g in Enum.GetValues(typeof(BookGenre)))
     {
         Console.WriteLine($"{(int)g} - {g}");
     }
     int genreNumber;
-    while (!int.TryParse(Console.ReadLine(), out genreNumber) || !Enum.IsDefined(typeof(Genre), genreNumber))
+    while (!int.TryParse(Console.ReadLine(), out genreNumber) || !Enum.IsDefined(typeof(BookGenre), genreNumber))
     {
         Console.Write("Неправильний вибір. Спробуйте ще раз: ");
     }
-    Genre genre = (Genre)genreNumber;
+    BookGenre genre = (BookGenre)genreNumber;
 
     return new Book(title, author, creationDate, pages, price, quantity, genre);
 }
