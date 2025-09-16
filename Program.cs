@@ -1,4 +1,5 @@
 ﻿using ConsoleApp1;
+using System.Linq.Expressions;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Console.Write("Введіть максимальну кількість книг (N > 0): ");
@@ -135,9 +136,20 @@ while (true)
                 case "5":
                     Console.Write("Введіть нову кількість сторінок: ");
                     if (int.TryParse(Console.ReadLine(), out int newCountOfPages))
-                        bookToModify.SetCountOfPages(newCountOfPages);
+                    {
+                        try
+                        {
+                            bookToModify.SetCountOfPages(newCountOfPages);
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
                     else
+                    {
                         Console.WriteLine("Неправильна кількість сторінок.");
+                    }
                     break;
                 default:
                     Console.WriteLine("Неправильна опція.");
