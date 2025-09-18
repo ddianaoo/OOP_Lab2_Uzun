@@ -1,5 +1,6 @@
 ﻿using ConsoleApp1;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Console.Write("Введіть максимальну кількість книг (N > 0): ");
@@ -97,7 +98,6 @@ while (true)
             Console.WriteLine("2 - Збільшити кількість");
             Console.WriteLine("3 - Зменшити кількість");
             Console.WriteLine("4 - Порівняти з іншою книгою");
-            Console.WriteLine("5 - Змінити кількість сторінок");
             Console.Write("Виберіть опцію: ");
             string action = Console.ReadLine();
 
@@ -132,24 +132,6 @@ while (true)
                     else
                         Console.WriteLine($"{bookToModify.Title} та {bookToCompare.Title} вийшли в один день");
 
-                    break;
-                case "5":
-                    Console.Write("Введіть нову кількість сторінок: ");
-                    if (int.TryParse(Console.ReadLine(), out int newCountOfPages))
-                    {
-                        try
-                        {
-                            bookToModify.SetCountOfPages(newCountOfPages);
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Неправильна кількість сторінок.");
-                    }
                     break;
                 default:
                     Console.WriteLine("Неправильна опція.");
@@ -206,61 +188,145 @@ while (true)
 
 Book CreateBookFromConsole()
 {
-    string title;
-    do
-    {
-        Console.Write("Введіть назву книги: ");
-        title = Console.ReadLine();
-    } while (string.IsNullOrWhiteSpace(title));
+    var book = new Book();
 
-    string author;
-    do
+    while (true)
     {
-        Console.Write("Введіть автора: ");
-        author = Console.ReadLine();
-    } while (string.IsNullOrWhiteSpace(author));
-
-    Console.Write("Введіть дату створення (yyyy-mm-dd): ");
-    DateOnly creationDate;
-    while (!DateOnly.TryParse(Console.ReadLine(), out creationDate) || creationDate > DateOnly.FromDateTime(DateTime.Today))
-    {
-        Console.Write("Неправильна дата. Введіть ще раз (yyyy-mm-dd, не пізніше сьогодні): ");
+        try
+        {
+            Console.Write("Введіть назву книги: ");
+            book.Title = Console.ReadLine();
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
     }
 
-    Console.Write("Введіть кількість сторінок: ");
-    int pages;
-    while (!int.TryParse(Console.ReadLine(), out pages) || pages <= 0)
+    while (true)
     {
-        Console.Write("Неправильне число. Введіть ще раз: ");
+        try
+        {
+            Console.Write("Введіть автора (Прізвище Ім’я): ");
+            book.Author = Console.ReadLine();
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
     }
 
-    Console.Write("Введіть ціну: ");
-    decimal price;
-    while (!decimal.TryParse(Console.ReadLine(), out price) || price < 0)
+    while (true)
     {
-        Console.Write("Неправильна ціна. Введіть ще раз: ");
+        try
+        {
+            Console.Write("Введіть дату створення (yyyy-mm-dd): ");
+            string input = Console.ReadLine();
+            if (!DateOnly.TryParse(input, out DateOnly date))
+            {
+                Console.WriteLine("Невірний формат дати.");
+                continue;
+            }
+            book.CreationDate = date;
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
     }
 
-    Console.Write("Введіть кількість: ");
-    int quantity;
-    while (!int.TryParse(Console.ReadLine(), out quantity) || quantity < 0)
+    while (true)
     {
-        Console.Write("Неправильне число. Введіть ще раз: ");
+        try
+        {
+            Console.Write("Введіть кількість сторінок: ");
+            string input = Console.ReadLine();
+            if (!int.TryParse(input, out int pages))
+            {
+                Console.WriteLine("Невірне число.");
+                continue;
+            }
+            book.CountOfPages = pages;
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
     }
 
-    Console.WriteLine("Оберіть жанр:");
-    foreach (var g in Enum.GetValues(typeof(BookGenre)))
+    while (true)
     {
-        Console.WriteLine($"{(int)g} - {g}");
+        try
+        {
+            Console.Write("Введіть ціну: ");
+            string input = Console.ReadLine();
+            if (!decimal.TryParse(input, out decimal price))
+            {
+                Console.WriteLine("Невірна ціна.");
+                continue;
+            }
+            book.ChangePrice(price);
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
     }
-    int genreNumber;
-    while (!int.TryParse(Console.ReadLine(), out genreNumber) || !Enum.IsDefined(typeof(BookGenre), genreNumber))
-    {
-        Console.Write("Неправильний вибір. Спробуйте ще раз: ");
-    }
-    BookGenre genre = (BookGenre)genreNumber;
 
-    return new Book(title, author, creationDate, pages, price, quantity, genre);
+    while (true)
+    {
+        try
+        {
+            Console.Write("Введіть кількість: ");
+            string input = Console.ReadLine();
+            if (!int.TryParse(input, out int quantity))
+            {
+                Console.WriteLine("Невірне число.");
+                continue;
+            }
+            book.ChangeQuantity(quantity);
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
+    }
+
+    while (true)
+    {
+        try
+        {
+            Console.WriteLine("Оберіть жанр:");
+            foreach (var g in Enum.GetValues(typeof(BookGenre)))
+            {
+                Console.WriteLine($"{(int)g} - {g}");
+            }
+
+            string input = Console.ReadLine();
+            if (!int.TryParse(input, out int genreNumber) || !Enum.IsDefined(typeof(BookGenre), genreNumber))
+            {
+                Console.WriteLine("Невірний вибір жанру.");
+                continue;
+            }
+            book.Genre = (BookGenre)genreNumber;
+            break;
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Помилка: {ex.Message}");
+        }
+    }
+
+    Console.Write("Введіть опис книги (необов’язково): ");
+    book.Description = Console.ReadLine();
+
+    return book;
 }
 
 void printBooks(List<Book> books)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ConsoleApp1
@@ -15,8 +16,19 @@ namespace ConsoleApp1
         private decimal price;
         private int quantity;
         private BookGenre genre;
+        private int countOfPages;
 
-        public int CountOfPages { get; private set; } = 100;
+        public string Description { get; set; } = "nice book";
+        public int CountOfPages
+        {
+            get => countOfPages;
+            set
+            {
+                if (value <= 0 || value > 10000)
+                    throw new ArgumentException("Кількість сторінок має бути в межах 1–10000.");
+                countOfPages = value;
+            }
+        }
         public string Title
         {
             get => title;
@@ -30,13 +42,15 @@ namespace ConsoleApp1
         }
         public string Author
         {
-            get => author; 
+            get => author;
             set
             {
-                if (!string.IsNullOrWhiteSpace(value))
-                    author = value;
-                else
+                if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("Автор не може бути порожнім.");
+                if (!Regex.IsMatch(value.Trim(), @"^[A-ZА-ЯЇІЄҐ][a-zа-яїієґ]* [A-ZА-ЯЇІЄҐ][a-zа-яїієґ]*$"))
+                    throw new ArgumentException("Автор повинен бути у форматі 'Прізвище Ім’я', лише букви, великі перші літери.");
+
+                author = value.Trim();
             }
         }
         public DateOnly CreationDate
@@ -55,8 +69,8 @@ namespace ConsoleApp1
             get => price;
             private set
             {
-                if (value < 0)
-                    throw new ArgumentException("Ціна не може бути від’ємною.");
+                if (value <= 0)
+                    throw new ArgumentException("Ціна має бути більше 0.");
                 price = value;
             }
         }
@@ -81,21 +95,7 @@ namespace ConsoleApp1
                 genre = value;
             }
         }
-        public decimal FullCost
-        {
-            get { return quantity * price; }
-        }
-
-        public Book(string title, string author, DateOnly creationDate, int countOfPages, decimal price, int quantity, BookGenre genre)
-        {
-            Title = title;
-            Author = author;
-            CreationDate = creationDate;
-            SetCountOfPages(countOfPages);
-            ChangePrice(price);
-            Quantity = quantity;
-            Genre = genre;
-        }
+        public decimal FullCost => quantity * price;
 
         public decimal ChangePrice(decimal newPrice)
         {
@@ -106,6 +106,12 @@ namespace ConsoleApp1
         public int IncreaseQuantity()
         {
             Quantity++;
+            return Quantity;
+        }
+
+        public int ChangeQuantity(int quantity)
+        {
+            Quantity = quantity;
             return Quantity;
         }
 
@@ -120,12 +126,6 @@ namespace ConsoleApp1
         {
             if (other == null) return 1;
             return this.creationDate.CompareTo(other.creationDate);
-        }
-        public void SetCountOfPages(int value)
-        {
-            if (value <= 0)
-                throw new ArgumentException("Кількість сторінок має бути більше нуля.");
-            CountOfPages = value;
         }
 
         public override string ToString()
