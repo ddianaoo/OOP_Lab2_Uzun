@@ -10,8 +10,8 @@ namespace ConsoleApp1
 {
     public class Book
     {
-        private string title;
-        private string author;
+        private string? title;
+        private string? author;
         private DateOnly creationDate;
         private decimal price;
         private int quantity;
@@ -130,7 +130,9 @@ namespace ConsoleApp1
 
         public override string ToString()
         {
-            return $"{title,-20} | {author,-18} | {creationDate:dd.MM.yyyy} | {CountOfPages,5} | {price,8} USD | {quantity,5} | {genre,-10}";
+            string desc = Description.Length > 20 ? Description.Substring(0, 17) + "..." : Description;
+
+            return $"{title,-20} | {author,-18} | {creationDate:dd.MM.yyyy} | {CountOfPages,5} | {price,8} USD | {quantity,5} | {genre,-10} | {desc,-30}";
         }
     }
 }
